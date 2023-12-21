@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+
+{% include 'navbar.html' %}
+<br>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content }}</p>
+                    {% for tag in post.tags.all %}
+                    <span class="badge badge-primary">#{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="container">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label class="left-aligned-label">Comment:</label>
+                        {{ form.comment_field }}
+                        <br>
+                        <input class="btn btn-primary" type="submit" value="Save">
+                    </form>
+                </div>
+                {% if comments %}
+                {% for comment in comments %}
+                {% if comment.is_reply != True %}
+                <div class="container">
+                    <div class="card border-secondary"
+                         style="max-width: auto; text-align: left; position: relative; margin-bottom: 20px;">
+                        <div class="card-header" style="color: #3897DB;">
+                            {{comment.author}}
+                        </div>
+                        <div class="card-body"
+                             style="position: relative; margin-bottom: 10px; display: flex; flex-direction: column;">
+                            <div>
+                                <h4 class="card-title">{{comment.comment_field}}</h4>
+                                <p class="card-text" style="margin-bottom: 0;">
+                                    {{comment.date_created|date:"Y-m-d H:i"}}
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-secondary dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                    Reply
+                                </button>
+                                <ul class="dropdown-menu" style="min-width: 250px; padding: 10px;">
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label class="left-aligned-label">Reply:</label>
+                                            {{ form.comment_field }}
+                                        </div>
+                                        <input type="hidden" name="reply_id" value="{{ comment.id }}">
+                                        <input class="btn btn-primary" type="submit" value="Replay">
+                                    </form>
+                                </ul>
+                            </div>
+                            {% for reply in comment.replies.all %}
+                            <div class="card border-secondary"
+                                 style="max-width: auto; text-align: left; position: relative; margin-top: 10px;">
+                                <div class="card-header" style="color: #3897DB;">{{reply.author}}<span
+                                        style="color: white;"> to</span> {{reply.reply.author}}
+                                </div>
+                                <div class="card-body" style="position: relative; margin-bottom: 10px;">
+                                    <div>
+                                        <h4 class="card-title">{{reply.comment_field}}</h4>
+                                        <p class="card-text" style="margin-bottom: 0;">
+                                            {{reply.date_created|date:"Y-m-d H:i"}}</p>
+                                    </div>
+                                    <!-- Add reply form here if needed -->
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% endif %}
+
+                {% endfor %}
+                {% else %}
+                <br>
+                <h4 style="text-align: center;">No comments yet...</h4>
+                <br>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+{% endblock %}

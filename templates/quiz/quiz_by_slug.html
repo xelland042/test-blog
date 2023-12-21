@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Quiz
+{% endblock  %}
+
+{% block content %}
+
+<form method="post" action="{% url 'quiz:categories-slug' slug=category_slug %}">
+    {% csrf_token %}
+
+    {% for quiz in quiz_questions %}
+    <p>{{ quiz.question }}</p>
+    {% for answer in answers %}
+    {% if answer.question == quiz %}
+    <input type="radio" id="{{ answer.id }}" name="{{ quiz.id }}" value="{{ answer.id }}">
+    <label for="{{ answer.id }}">{{ answer.answer }}</label><br>
+    {% endif %}
+    {% endfor %}
+    <p>_____________________________________________________</p>
+    {% endfor %}
+
+    <input type="submit" value="Submit">
+</form>
+
+{% endblock %}
